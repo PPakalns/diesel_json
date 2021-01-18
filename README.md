@@ -9,7 +9,7 @@ as queryable, insertable JsonB fields.
 Wrap data structures into `diesel_json::Json` type.
 
 ```rust
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct ComplexStruct {
   // ...
 }
@@ -24,7 +24,9 @@ struct ExampleTable {
 ```
 
 `Json` type provides `new` function for object initialization, implements `Deref`,
-`DerefMut`, `AsRef`, `AsMut` that maps data access directly to underlying data.
+`DerefMut`, `AsRef`, `AsMut` and other traits that maps data access directly to underlying data.
+
+See `tests/postgresql.rs` for example use.
 
 ## Why should I use this library?
 
@@ -39,8 +41,11 @@ impl<T> ToSql<sql_types::JsonB, Pg> for Json<T> {}
 ## TODO:
 
 - [ ] Support not only JsonB, but also Json postgres type
-- [ ] Support more database drivers
+- Support more database drivers
     - [x] PostgreSQL
     - [ ] MySql
     - [ ] SQLite
-- [ ] Improve testing of library
+- Improve testing of the library
+    - [x] Test insertion and retrieval of nullable/non-nullable JsonB postgresql fields.
+    - [ ] Add support and test Json field insertion and retrieval
+    - TODO(Expand): Add support for other database driver Json fields

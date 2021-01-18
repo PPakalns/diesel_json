@@ -1,5 +1,10 @@
 //! Implements utility type for JSON, JSONB field handling in diesel
 
+#[macro_use]
+extern crate diesel;
+#[macro_use]
+extern crate serde;
+
 use diesel::pg::Pg;
 use diesel::sql_types;
 use diesel::{deserialize::FromSql, serialize::ToSql};
@@ -11,20 +16,19 @@ use std::ops::{Deref, DerefMut};
 ///
 /// Use as wrapper for fields that are stored in Jsonb format
 /// ```ignore
-/// #[derive(serde::Serialize, serde::Deserialize)]
+/// #[derive(serde::Serialize, serde::Deserialize, Debug)]
 /// pub struct ComplexStruct {
 ///   // ...
 /// }
 ///
-/// #[derive(serde::Serialize, serde::Deserialize, diesel::Queryable, diesel::Insertable)]
+/// #[derive(serde::Serialize, serde::Deserialize,
+///          diesel::Queryable, diesel::Insertable)]
 /// pub struct ExampleTable {
 ///     // Field that will be stored in Json, Jsonb format
 ///     pub jsonb_field: diesel_json::Json<ComplexStruct>,
 /// }
 /// ```
-#[derive(
-    diesel::FromSqlRow, diesel::AsExpression, serde::Serialize, serde::Deserialize, Debug, Clone,
-)]
+#[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 #[serde(transparent)]
 #[sql_type = "sql_types::Jsonb"]
 pub struct Json<T: Sized>(pub T);
@@ -81,5 +85,14 @@ where
     ) -> diesel::serialize::Result {
         let value = serde_json::to_value(self)?;
         <serde_json::Value as ToSql<sql_types::Jsonb, Pg>>::to_sql(&value, out)
+    }
+}
+
+impl<T> PartialEq for Json<T>
+where
+    T: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
     }
 }
