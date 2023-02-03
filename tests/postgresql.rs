@@ -37,7 +37,7 @@ struct JsonbTest {
 use schema::jsonb_test;
 
 #[derive(Insertable)]
-#[table_name = "jsonb_test"]
+#[diesel(table_name = jsonb_test)]
 struct JsonbTestInsert {
     nullable: Option<Json<ComplexData>>,
     not_nullable: Json<ComplexData>,
@@ -67,10 +67,10 @@ fn test_insert_and_select() {
         },
     ];
 
-    let connection = setup::transaction_connection();
+    let mut connection = setup::transaction_connection();
     let result = diesel::insert_into(schema::jsonb_test::dsl::jsonb_test)
         .values(&test_data)
-        .get_results::<JsonbTest>(&connection)
+        .get_results::<JsonbTest>(&mut connection)
         .expect("Error inserting and retrieving inserted data");
     assert_eq!(result.len(), 2);
 

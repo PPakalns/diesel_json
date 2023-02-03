@@ -2,6 +2,7 @@ use std::sync::Once;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::Connection;
+use diesel_migrations::{FileBasedMigrations, MigrationHarness};
 
 static INIT: Once = Once::new();
 
@@ -16,20 +17,19 @@ fn establish_connection() -> PgConnection {
 /// Setup function that is only run once, even if called multiple times.
 pub fn setup() {
     INIT.call_once(|| {
-        let migration_dir = diesel_migrations::find_migrations_directory().unwrap();
-        diesel_migrations::run_pending_migrations_in_directory(
-            &establish_connection(),
-            &migration_dir,
-            &mut std::io::sink(),
-        )
-        .expect("Migrations didn't succeed");
+        let migrations = FileBasedMigrations::find_migrations_directory().unwrap();
+        let mut connection = establish_connection();
+        connection
+            .run_pending_migrations(migrations)
+            .expect("Migrations didn't succeed");
+        connection.begin_test_transaction().unwrap();
     });
 }
 
 pub fn transaction_connection() -> PgConnection {
-    let result = establish_connection();
+    let mut connection = establish_connection();
     // #[cfg(feature = "sqlite")]
-    // result.execute("PRAGMA foreign_keys = ON").unwrap();
-    result.begin_test_transaction().unwrap();
-    result
+    // connection.execute("PRAGMA foreign_keys = ON").unwrap();
+    connection.begin_test_transaction().unwrap();
+    connection
 }

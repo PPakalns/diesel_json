@@ -5,7 +5,7 @@ extern crate diesel;
 #[macro_use]
 extern crate serde;
 
-use diesel::pg::Pg;
+use diesel::pg::{Pg, PgValue};
 use diesel::sql_types;
 use diesel::{deserialize::FromSql, serialize::ToSql};
 use serde::de::DeserializeOwned;
@@ -30,7 +30,7 @@ use std::ops::{Deref, DerefMut};
 /// ```
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 #[serde(transparent)]
-#[sql_type = "sql_types::Jsonb"]
+#[diesel(sql_type = sql_types::Jsonb)]
 pub struct Json<T: Sized>(pub T);
 
 impl<T> Json<T> {
@@ -69,7 +69,7 @@ impl<T> FromSql<sql_types::Jsonb, Pg> for Json<T>
 where
     T: std::fmt::Debug + DeserializeOwned,
 {
-    fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
+    fn from_sql(bytes: PgValue) -> diesel::deserialize::Result<Self> {
         let value = <serde_json::Value as FromSql<sql_types::Jsonb, Pg>>::from_sql(bytes)?;
         Ok(Json(serde_json::from_value::<T>(value)?))
     }
@@ -79,12 +79,9 @@ impl<T> ToSql<sql_types::Jsonb, Pg> for Json<T>
 where
     T: std::fmt::Debug + Serialize,
 {
-    fn to_sql<W: std::io::Write>(
-        &self,
-        out: &mut diesel::serialize::Output<W, Pg>,
-    ) -> diesel::serialize::Result {
+    fn to_sql(&self, out: &mut diesel::serialize::Output<Pg>) -> diesel::serialize::Result {
         let value = serde_json::to_value(self)?;
-        <serde_json::Value as ToSql<sql_types::Jsonb, Pg>>::to_sql(&value, out)
+        <serde_json::Value as ToSql<sql_types::Jsonb, Pg>>::to_sql(&value, &mut out.reborrow())
     }
 }
 
