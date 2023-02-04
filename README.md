@@ -6,6 +6,11 @@ as queryable, insertable JsonB fields.
 
 ## Getting started
 
+Add diesel_json dependency to Cargo.toml.
+
+* Diesel 2.0 supported: `diesel_json = "0.2"`
+* Diesel 1.4 supported: `diesel_json = "0.1"`
+
 Wrap data structures into `diesel_json::Json` type.
 
 ```rust
@@ -14,11 +19,15 @@ struct ComplexStruct {
   // ...
 }
 
+use diesel_json::Json;
+
 #[derive(Serialize, Deserialize, Queryable, Insertable, AsChangeset, Identifiable)]
 struct ExampleTable {
     // ...
     // Field that will be stored in Jsonb format
     jsonb_field: diesel_json::Json<ComplexStruct>,
+    // Or simply as 
+    jsonb_field2: Json<ComplexStruct>,
     // ...
 }
 ```
