@@ -93,3 +93,12 @@ where
         self.0 == other.0
     }
 }
+
+impl<T> Default for Json<T>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        Json(T::default())
+    }
+}
