@@ -1,6 +1,6 @@
 [package]
 name = "diesel_json"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Pēteris Pakalns <peterispakalns@gmail.com>"]
 edition = "2018"
 license = "MIT"
