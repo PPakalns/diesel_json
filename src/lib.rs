@@ -1,15 +1,11 @@
 //! Implements utility type for JSON, JSONB field handling in diesel
-
-extern crate diesel;
-#[macro_use]
-extern crate serde;
-
 use diesel::deserialize::FromSqlRow;
 use diesel::expression::AsExpression;
 use diesel::pg::{Pg, PgValue};
 use diesel::sql_types;
 use diesel::{deserialize::FromSql, serialize::ToSql};
 use serde::de::DeserializeOwned;
+use serde::Deserialize;
 use serde::Serialize;
 use std::ops::{Deref, DerefMut};
 
