@@ -4,9 +4,9 @@ use diesel::expression::AsExpression;
 use diesel::pg::{Pg, PgValue};
 use diesel::sql_types;
 use diesel::{deserialize::FromSql, serialize::ToSql};
-use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::ops::{Deref, DerefMut};
 
 /// Wrapper type that implements Json data handling for postgres diesel connection
