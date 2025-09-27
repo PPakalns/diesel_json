@@ -8,7 +8,9 @@ as queryable, insertable JsonB fields.
 
 Add diesel_json dependency to Cargo.toml.
 
-* Diesel 2.0 supported: `diesel_json = "0.2"`
+* Diesel 2.0 supported: 
+  * `diesel_json = "0.3"` with diesel `postgres_backend` feature requirement.
+  * `diesel_json = "0.2"` with diesel `postgres` feature requirement.
 * Diesel 1.4 supported: `diesel_json = "0.1"`
 
 Wrap data structures into `diesel_json::Json` type.
